@@ -1,59 +1,69 @@
 import React from "react";
-import Navbar from "./components/navbar";
-import Todo from "./components/Todo";
-import TodoForm from "./components/TodoForm";
+import { useState } from "react";
+import Layout from "./components/Layout";
+import CustomForm from "./components/CustomForm";
+import Button from "./components/Button";
+import TaskList from "./components/TaskList";
 
-function App() {
-  const [todos, setTodos] = React.useState([
+const App = () => {
+  const [task, setTask] = useState([
     {
-      text: "makan",
-      isCompleted: false,
+      name: "Minum",
+      cheked: true,
     },
     {
-      text: "minum",
-      isCompleted: false,
-    },
-    {
-      text: "tidur",
-      isCompleted: false,
+      name: "Modol",
+      cheked: false,
     },
   ]);
 
-  const addTodo = (text) => {
-    const newTodos = [...todos, { text }];
-    setTodos(newTodos);
+  const [isEdit, setIsEdit] = useState(false);
+
+  const addTask = (task) => {
+    setTask((prevState) => [...prevState, task]);
   };
 
-  const completeTodo = (index) => {
-    const newTodos = [...todos];
-    newTodos[index].isCompleted = true;
-    setTodos(newTodos);
+  const handleRemoveTodo = (index) =>
+    index > -1 && setTask((prev) => [...prev.splice(index, 1), ...prev]);
+
+  const handleCheckTodo = (index, checked) => {
+    const newItem = task.map((item, ind) => {
+      if (ind === index) {
+        return { ...item, cheked: checked };
+      }
+      return item;
+    });
+    setTask(newItem);
   };
 
-  const removeTodo = (index) => {
-    const newTodos = [...todos];
-    newTodos.splice(index, 1);
-    setTodos(newTodos);
+  const handleEditTodo = (index) => {
+    setIsEdit(true);
+    setInputTodo(task[index]);
+    console.log("click");
   };
 
   return (
-    <div className="app">
-      <Navbar />
-      <div className="todo-list bg-gray-400 h-screen p-4">
-        {todos.map((todo, index) => (
-          <Todo
+    <>
+      <Layout>
+        <h1 className="text-blue-600 font-bold text-2xl">My Task List</h1>
+        <div className="flex flex-row gap-2">
+          <CustomForm addTask={addTask}>
+            <Button />
+          </CustomForm>
+        </div>
+        {task.map((item, index) => (
+          <TaskList
             key={index}
             index={index}
-            todo={todo}
-            completeTodo={completeTodo}
-            removeTodo={removeTodo}
+            tasks={item}
+            checkTodo={handleCheckTodo}
+            removeTodo={() => handleRemoveTodo(index)}
+            editTodo={() => handleEditTodo(index)}
           />
         ))}
-        <h1 className="text-2xl font-bold">Mau melakukan Apa Hari Ini?</h1>
-        <TodoForm addTodo={addTodo} />
-      </div>
-    </div>
+      </Layout>
+    </>
   );
-}
+};
 
 export default App;
